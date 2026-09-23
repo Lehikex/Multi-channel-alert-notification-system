@@ -9,3 +9,5 @@ export * from "./source-api.js";
 export * from "./ingestion.js";
 export * from "./message-queue.js";
 export * from "./dispatch-settings.js";
+export * from "./rule-repository.js";
+export * from "./rule-consumer.js";

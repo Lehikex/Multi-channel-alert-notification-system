@@ -33,6 +33,19 @@ npm run build
 npm start
 ```
 
+The rule-engine consumer entry point is:
+
+```bash
+npm run build
+npm run start:rule-engine
+```
+
+The consumer is transport-neutral: `RuleEngineConsumer` receives an
+`EventBusConsumer` implementation, looks up active rules by source, matches
+events, persists idempotent notifications, publishes them to dispatch, and
+acknowledges the bus message. The current worker entry point is setup mode
+until a managed Kafka/MSK client is wired into the `EventBusConsumer` port.
+
 Endpoints are available under `/api/sources`:
 
 - `GET /api/sources`
