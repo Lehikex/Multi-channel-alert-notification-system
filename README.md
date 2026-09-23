@@ -19,3 +19,13 @@ npm install
 npm test
 npm run build
 ```
+
+Infrastructure is defined in [terraform/](/workspaces/Multi-channel-alert-notification-system/terraform).
+
+The React admin frontend is in [frontend/](/workspaces/Multi-channel-alert-notification-system/frontend):
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
