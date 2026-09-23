@@ -45,6 +45,14 @@ export class SourceRegistry {
     for (const field of schema.required) {
       if (!(field in source.config)) throw new Error(`Missing source config field: ${field}`);
     }
+    for (const [field, definition] of Object.entries(schema.properties)) {
+      const value = source.config[field];
+      if (value === undefined) continue;
+      const valid = definition.type === "array" ? Array.isArray(value) :
+        definition.type === "object" ? typeof value === "object" && value !== null && !Array.isArray(value) :
+        typeof value === definition.type;
+      if (!valid) throw new Error(`Invalid source config field: ${field}`);
+    }
   }
 
   schemas(): Record<string, ConfigSchema> {

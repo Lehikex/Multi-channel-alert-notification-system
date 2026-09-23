@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { Source } from "./types.js";
+import type { SourceRegistry } from "./registries.js";
 
 export interface SourceRepository {
   list(): Promise<Source[]>;
@@ -54,6 +55,32 @@ export class InMemorySourceRepository implements SourceRepository {
 
   async delete(id: string): Promise<boolean> {
     return this.sources.delete(id);
+  }
+}
+
+export class ValidatingSourceRepository implements SourceRepository {
+  constructor(
+    private readonly delegate: SourceRepository,
+    private readonly registry: SourceRegistry
+  ) {}
+
+  list(): Promise<Source[]> { return this.delegate.list(); }
+  getById(id: string): Promise<Source | null> { return this.delegate.getById(id); }
+  async create(source: Omit<Source, "id">): Promise<Source> {
+    this.validate({ ...source, id: "validation" });
+    return this.delegate.create(source);
+  }
+  async update(id: string, changes: Partial<Omit<Source, "id">>): Promise<Source | null> {
+    const current = await this.delegate.getById(id);
+    if (!current) return null;
+    const merged = { ...current, ...changes, config: changes.config ?? current.config };
+    this.validate(merged);
+    return this.delegate.update(id, changes);
+  }
+  delete(id: string): Promise<boolean> { return this.delegate.delete(id); }
+
+  private validate(source: Source): void {
+    this.registry.validate(source);
   }
 }
 

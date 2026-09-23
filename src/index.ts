@@ -6,3 +6,4 @@ export * from "./rule-engine.js";
 export * from "./dispatch.js";
 export * from "./source-repository.js";
 export * from "./source-api.js";
+export * from "./ingestion.js";

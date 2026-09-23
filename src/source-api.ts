@@ -1,12 +1,13 @@
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import type { Source, SourceCategory } from "./types.js";
 import type { SourceRepository } from "./source-repository.js";
+import type { IngestionManager } from "./ingestion.js";
 
 const categories: SourceCategory[] = ["news", "market", "disaster"];
 const statuses = ["pending_authorization", "active", "disabled", "degraded"] as const;
 type SourceStatus = (typeof statuses)[number];
 
-export function createSourceApiServer(repository: SourceRepository): Server {
+export function createSourceApiServer(repository: SourceRepository, ingestion?: IngestionManager): Server {
   return createServer(async (request, response) => {
     response.setHeader("Access-Control-Allow-Origin", "*");
     response.setHeader("Access-Control-Allow-Methods", "GET,POST,PATCH,DELETE,OPTIONS");
@@ -18,6 +19,10 @@ export function createSourceApiServer(repository: SourceRepository): Server {
 
     try {
       const url = new URL(request.url ?? "/", `http://${request.headers.host ?? "localhost"}`);
+      if (request.method === "GET" && url.pathname === "/api/ingestion") {
+        sendJson(response, 200, { data: ingestion?.states() ?? [] });
+        return;
+      }
       const match = url.pathname.match(/^\/api\/sources(?:\/([^/]+))?$/);
       if (!match) {
         sendJson(response, 404, { error: "Route not found" });
@@ -37,24 +42,28 @@ export function createSourceApiServer(repository: SourceRepository): Server {
       if (request.method === "POST" && !id) {
         const body = await readJson(request);
         const source = await repository.create(validateCreate(body));
+        await ingestion?.reconcile(source.id);
         sendJson(response, 201, { data: source });
         return;
       }
       if (request.method === "PATCH" && id) {
         const body = await readJson(request);
         const source = await repository.update(id, validateUpdate(body));
+        if (source) await ingestion?.reconcile(source.id);
         sendJson(response, source ? 200 : 404, source ? { data: source } : { error: "Source not found" });
         return;
       }
       if (request.method === "DELETE" && id) {
         const deleted = await repository.delete(id);
+        ingestion?.stop(id);
         sendJson(response, deleted ? 204 : 404, deleted ? undefined : { error: "Source not found" });
         return;
       }
       sendJson(response, 405, { error: "Method not allowed" });
     } catch (error) {
       const message = error instanceof Error ? error.message : "Request failed";
-      sendJson(response, message.startsWith("Invalid") ? 400 : 500, { error: message });
+      const isClientError = message.startsWith("Invalid") || message.startsWith("Missing");
+      sendJson(response, isClientError ? 400 : 500, { error: message });
     }
   });
 }

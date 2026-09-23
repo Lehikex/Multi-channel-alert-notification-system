@@ -28,3 +28,48 @@ export class RSSAdapter extends BaseAdapter {
   }
   supportsFiltering(): boolean { return false; }
 }
+
+export class WebSocketAdapter extends BaseAdapter {
+  static configSchema(): ConfigSchema {
+    return {
+      type: "object",
+      required: ["endpoint", "heartbeat_interval_sec"],
+      properties: {
+        endpoint: { type: "string" },
+        heartbeat_interval_sec: { type: "number" },
+        initial_channels: { type: "array" }
+      }
+    };
+  }
+  supportsFiltering(): boolean { return true; }
+}
+
+export class WebhookAdapter extends BaseAdapter {
+  static configSchema(): ConfigSchema {
+    return {
+      type: "object",
+      required: ["inbound_path"],
+      properties: {
+        registration_endpoint: { type: "string" },
+        inbound_path: { type: "string" },
+        subscription_renewal: { type: "object" }
+      }
+    };
+  }
+  supportsFiltering(): boolean { return false; }
+}
+
+export class GDELTAdapter extends RestPollAdapter {
+  static configSchema(): ConfigSchema {
+    return {
+      type: "object",
+      required: ["endpoint", "poll_interval_sec"],
+      properties: {
+        endpoint: { type: "string" },
+        poll_interval_sec: { type: "number" },
+        themes: { type: "array" },
+        keywords: { type: "array" }
+      }
+    };
+  }
+}

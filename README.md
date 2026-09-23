@@ -36,6 +36,7 @@ Endpoints are available under `/api/sources`:
 - `POST /api/sources`
 - `PATCH /api/sources/:id`
 - `DELETE /api/sources/:id`
+- `GET /api/ingestion`
 
 The API currently uses [InMemorySourceRepository](/workspaces/Multi-channel-alert-notification-system/src/source-repository.ts)
 with seeded data. The `SourceRepository` interface is the persistence seam for
