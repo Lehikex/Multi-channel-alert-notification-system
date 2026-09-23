@@ -22,6 +22,25 @@ npm run build
 
 Infrastructure is defined in [terraform/](/workspaces/Multi-channel-alert-notification-system/terraform).
 
+The mock source CRUD API can be started with:
+
+```bash
+npm run build
+npm start
+```
+
+Endpoints are available under `/api/sources`:
+
+- `GET /api/sources`
+- `GET /api/sources/:id`
+- `POST /api/sources`
+- `PATCH /api/sources/:id`
+- `DELETE /api/sources/:id`
+
+The API currently uses [InMemorySourceRepository](/workspaces/Multi-channel-alert-notification-system/src/source-repository.ts)
+with seeded data. The `SourceRepository` interface is the persistence seam for
+replacing it with DynamoDB or another database implementation.
+
 The React admin frontend is in [frontend/](/workspaces/Multi-channel-alert-notification-system/frontend):
 
 ```bash

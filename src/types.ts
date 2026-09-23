@@ -17,8 +17,14 @@ export interface Source {
   name: string;
   category: SourceCategory;
   adapterClass: string;
+  status: "pending_authorization" | "active" | "disabled" | "degraded";
   config: Record<string, unknown>;
   supportsFiltering: boolean;
+  health: {
+    lastSuccessfulPull: string | null;
+    consecutiveFailures: number;
+    lastError: string | null;
+  };
 }
 
 export interface Event {
