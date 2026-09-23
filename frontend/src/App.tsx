@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 
 type Status = "Active" | "Degraded" | "Pending auth";
-type Page = "Overview" | "Users" | "Sources" | "Delivery";
+type Page = "Overview" | "Users" | "Sources" | "Delivery" | "Settings";
 type SourceCategory = "News" | "Market" | "Disaster";
 type SourceDraft = { name: string; category: SourceCategory; type: string; endpoint: string; supportsFiltering: boolean };
 type Source = SourceDraft & { id: number; status: Status; events: string; latency: string; updated: string };
@@ -55,13 +55,13 @@ function App() {
           ))}
         </nav>
         <div className="sidebar-bottom">
-          <button className="nav-item"><Icon name="settings" />Settings</button>
+          <button className={page === "Settings" ? "nav-item active" : "nav-item"} onClick={() => setPage("Settings")}><Icon name="settings" />Settings</button>
           <div className="profile"><div className="avatar">JM</div><div><strong>Jamie Miller</strong><small>Administrator</small></div><span>⌄</span></div>
         </div>
       </aside>
       <main className="content">
         <header className="topbar"><div><span className="eyebrow">CONTROL CENTER</span><h1>{page}</h1></div><div className="top-actions"><span className="live"><i />All systems operational</span><button className="icon-button">⌕</button><button className="icon-button">?</button></div></header>
-        {page === "Overview" ? <Overview onAction={notify} sources={sourceList} /> : page === "Sources" ? <Sources sources={sourceList} setSources={setSourceList} onAction={notify} /> : page === "Users" ? <Users onAction={notify} /> : <Delivery />}
+        {page === "Overview" ? <Overview onAction={notify} sources={sourceList} /> : page === "Sources" ? <Sources sources={sourceList} setSources={setSourceList} onAction={notify} /> : page === "Users" ? <Users onAction={notify} /> : page === "Delivery" ? <Delivery /> : <Settings onAction={notify} />}
       </main>
       {toast && <div className="toast">✓ {toast}</div>}
     </div>
@@ -142,6 +142,14 @@ function Users({ onAction }: { onAction: (message: string) => void }) {
 
 function Delivery() {
   return <div className="page-body"><div className="welcome"><div><h2>Delivery performance</h2><p>Monitor notification delivery across every channel.</p></div></div><section className="metric-grid"><Metric label="Sent today" value="18,429" change="+21.3%" detail="vs. yesterday" accent="orange" /><Metric label="Successful" value="18,392" change="99.8%" detail="delivery rate" accent="green" /><Metric label="Retrying" value="24" change="0.1%" detail="of all deliveries" accent="purple" /><Metric label="Failed" value="13" change="0.07%" detail="of all deliveries" accent="blue" /></section><section className="card empty-delivery"><div className="delivery-graphic">✓</div><h3>All channels are healthy</h3><p>There are no delivery incidents requiring attention.</p></section></div>;
+}
+
+function Settings({ onAction }: { onAction: (message: string) => void }) {
+  return <div className="page-body"><div className="welcome"><div><h2>Platform settings</h2><p>Configure the queues that connect ingestion, rules, and notification delivery.</p></div><span className="config-readonly">Environment managed</span></div><div className="settings-grid"><section className="card settings-card"><div className="card-head"><div><h3>Event bus</h3><p>Replayable event stream for normalized events</p></div><Badge status="Active" /></div><div className="settings-body"><Setting label="Provider" value="Amazon MSK Serverless" /><Setting label="Topic" value="world-events" /><Setting label="Consumer group" value="rule-engine" /><Setting label="Security" value="IAM authentication" /></div></section><section className="card settings-card"><div className="card-head"><div><h3>Dispatch queue</h3><p>SQS queue for channel delivery jobs</p></div><Badge status="Active" /></div><div className="settings-body"><Setting label="Provider" value="Amazon SQS" /><Setting label="Batch size" value="10 messages" /><Setting label="Visibility timeout" value="120 seconds" /><Setting label="Max retries" value="5 attempts" /></div></section></div><section className="card queue-note"><div className="queue-note-icon">↔</div><div><h3>Queue settings are environment managed</h3><p>Queue URLs, brokers, and credentials are loaded by the backend from deployment environment variables. Secrets are never exposed in this admin view.</p></div><button className="secondary" onClick={() => onAction("Queue health check requested")}>Test connection</button></section></div>;
+}
+
+function Setting({ label, value }: { label: string; value: string }) {
+  return <div className="setting-row"><span>{label}</span><strong>{value}</strong></div>;
 }
 
 export default App;

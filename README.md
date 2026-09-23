@@ -37,10 +37,28 @@ Endpoints are available under `/api/sources`:
 - `PATCH /api/sources/:id`
 - `DELETE /api/sources/:id`
 - `GET /api/ingestion`
+- `GET /api/settings/message-queue`
 
 The API currently uses [InMemorySourceRepository](/workspaces/Multi-channel-alert-notification-system/src/source-repository.ts)
 with seeded data. The `SourceRepository` interface is the persistence seam for
 replacing it with DynamoDB or another database implementation.
+
+Message-queue settings are loaded from environment variables. The default
+architecture uses Amazon MSK for the replayable event bus and Amazon SQS for
+dispatch:
+
+```bash
+MESSAGE_QUEUE_EVENT_BUS_PROVIDER=msk
+MESSAGE_QUEUE_EVENT_BUS_BROKERS=b-1.example:9098,b-2.example:9098
+MESSAGE_QUEUE_EVENT_BUS_TOPIC=world-events
+MESSAGE_QUEUE_EVENT_BUS_CONSUMER_GROUP=rule-engine
+MESSAGE_QUEUE_EVENT_BUS_SECURITY_PROTOCOL=iam
+MESSAGE_QUEUE_DISPATCH_URL=https://sqs.us-east-1.amazonaws.com/123/world-alerts-dispatch
+MESSAGE_QUEUE_DISPATCH_DLQ_URL=https://sqs.us-east-1.amazonaws.com/123/world-alerts-dispatch-dlq
+MESSAGE_QUEUE_VISIBILITY_TIMEOUT_SECONDS=120
+MESSAGE_QUEUE_MAX_RECEIVE_COUNT=5
+MESSAGE_QUEUE_BATCH_SIZE=10
+```
 
 The React admin frontend is in [frontend/](/workspaces/Multi-channel-alert-notification-system/frontend):
 

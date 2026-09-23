@@ -2,12 +2,17 @@ import { createServer, type IncomingMessage, type Server, type ServerResponse } 
 import type { Source, SourceCategory } from "./types.js";
 import type { SourceRepository } from "./source-repository.js";
 import type { IngestionManager } from "./ingestion.js";
+import type { MessageQueueSettings } from "./message-queue.js";
 
 const categories: SourceCategory[] = ["news", "market", "disaster"];
 const statuses = ["pending_authorization", "active", "disabled", "degraded"] as const;
 type SourceStatus = (typeof statuses)[number];
 
-export function createSourceApiServer(repository: SourceRepository, ingestion?: IngestionManager): Server {
+export function createSourceApiServer(
+  repository: SourceRepository,
+  ingestion?: IngestionManager,
+  messageQueue?: MessageQueueSettings
+): Server {
   return createServer(async (request, response) => {
     response.setHeader("Access-Control-Allow-Origin", "*");
     response.setHeader("Access-Control-Allow-Methods", "GET,POST,PATCH,DELETE,OPTIONS");
@@ -21,6 +26,10 @@ export function createSourceApiServer(repository: SourceRepository, ingestion?: 
       const url = new URL(request.url ?? "/", `http://${request.headers.host ?? "localhost"}`);
       if (request.method === "GET" && url.pathname === "/api/ingestion") {
         sendJson(response, 200, { data: ingestion?.states() ?? [] });
+        return;
+      }
+      if (request.method === "GET" && url.pathname === "/api/settings/message-queue") {
+        sendJson(response, 200, { data: messageQueue ?? null });
         return;
       }
       const match = url.pathname.match(/^\/api\/sources(?:\/([^/]+))?$/);

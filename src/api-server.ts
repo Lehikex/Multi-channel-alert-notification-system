@@ -3,6 +3,7 @@ import { createSourceApiServer } from "./source-api.js";
 import { SourceRegistry } from "./registries.js";
 import { GDELTAdapter, RestPollAdapter, RSSAdapter, WebhookAdapter, WebSocketAdapter } from "./adapters.js";
 import { IngestionManager } from "./ingestion.js";
+import { loadMessageQueueSettings } from "./message-queue.js";
 
 const port = Number(process.env.PORT ?? 3000);
 const registry = new SourceRegistry();
@@ -13,7 +14,8 @@ registry.register("webhook", WebhookAdapter);
 registry.register("gdelt", GDELTAdapter);
 const repository = new ValidatingSourceRepository(new InMemorySourceRepository(), registry);
 const ingestion = new IngestionManager(repository, registry);
-const server = createSourceApiServer(repository, ingestion);
+const messageQueue = loadMessageQueueSettings();
+const server = createSourceApiServer(repository, ingestion, messageQueue);
 
 void ingestion.startAll().then(() => {
   server.listen(port, "0.0.0.0", () => {
