@@ -22,6 +22,10 @@ npm run build
 
 Infrastructure is defined in [terraform/](/workspaces/Multi-channel-alert-notification-system/terraform).
 
+CI workflows are defined in [.github/workflows/ci.yml](/workspaces/Multi-channel-alert-notification-system/.github/workflows/ci.yml).
+They test the backend, build the React frontend, validate Terraform, and apply
+the PostgreSQL migrations against a disposable PostgreSQL service.
+
 The mock source CRUD API can be started with:
 
 ```bash
