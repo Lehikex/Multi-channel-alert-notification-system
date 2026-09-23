@@ -38,6 +38,7 @@ Endpoints are available under `/api/sources`:
 - `DELETE /api/sources/:id`
 - `GET /api/ingestion`
 - `GET /api/settings/message-queue`
+- `GET /api/settings/dispatch`
 
 The API currently uses [InMemorySourceRepository](/workspaces/Multi-channel-alert-notification-system/src/source-repository.ts)
 with seeded data. The `SourceRepository` interface is the persistence seam for
@@ -58,6 +59,23 @@ MESSAGE_QUEUE_DISPATCH_DLQ_URL=https://sqs.us-east-1.amazonaws.com/123/world-ale
 MESSAGE_QUEUE_VISIBILITY_TIMEOUT_SECONDS=120
 MESSAGE_QUEUE_MAX_RECEIVE_COUNT=5
 MESSAGE_QUEUE_BATCH_SIZE=10
+```
+
+Email and Slack dispatch settings are also loaded from environment variables.
+Only configuration flags and non-sensitive metadata are returned by the
+settings API; provider credentials and webhook URLs are never returned:
+
+```bash
+DISPATCH_EMAIL_PROVIDER=ses
+DISPATCH_EMAIL_FROM_ADDRESS=alerts@example.com
+DISPATCH_EMAIL_REGION=us-east-1
+DISPATCH_EMAIL_API_KEY=
+DISPATCH_SMTP_HOST=
+DISPATCH_SMTP_PORT=587
+DISPATCH_EMAIL_MAX_PER_SECOND=10
+DISPATCH_SLACK_WEBHOOK_URL=
+DISPATCH_SLACK_TIMEOUT_MS=5000
+DISPATCH_SLACK_MAX_PER_SECOND=5
 ```
 
 The React admin frontend is in [frontend/](/workspaces/Multi-channel-alert-notification-system/frontend):

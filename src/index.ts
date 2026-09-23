@@ -8,3 +8,4 @@ export * from "./source-repository.js";
 export * from "./source-api.js";
 export * from "./ingestion.js";
 export * from "./message-queue.js";
+export * from "./dispatch-settings.js";
