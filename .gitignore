@@ -8,3 +8,4 @@ terraform/crash.log
 frontend/node_modules/
 frontend/dist/
 frontend/*.tsbuildinfo
+db/*.env

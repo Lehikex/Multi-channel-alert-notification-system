@@ -1,0 +1,10 @@
+DROP TABLE IF EXISTS user_channel_config;
+DROP TABLE IF EXISTS app_user;
+DROP TYPE IF EXISTS rule_mode;
+DROP TYPE IF EXISTS source_category;
+DROP TYPE IF EXISTS source_status;
+DROP TYPE IF EXISTS delivery_status;
+DROP TYPE IF EXISTS channel_type;
+DROP TYPE IF EXISTS user_status;
+DROP EXTENSION IF EXISTS citext;
+DROP EXTENSION IF EXISTS pgcrypto;
